@@ -1,0 +1,15 @@
+{
+  "name": "NeighbourGo",
+  "description": "AI-powered community support, from need to action. Helping neighbors organize housing, food, care, and local aid with intelligent matching and multilingual assistance.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "Request Classification",
+    "Multilingual Translation",
+    "AI Moderation",
+    "Intelligent Resource Matching",
+    "Civic Analytics"
+  ]
+}
