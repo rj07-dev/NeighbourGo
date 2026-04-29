@@ -23,9 +23,29 @@ export default function VolunteersPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  const [search, setSearch] = useState('');
+  const [selectedLangs, setSelectedLangs] = useState<string[]>([]);
+
   useEffect(() => {
     fetchOffers();
   }, []);
+
+  const filteredOffers = offers.filter(offer => {
+    const matchesSearch = !search || 
+      offer.userName.toLowerCase().includes(search.toLowerCase()) || 
+      offer.skills.some(s => s.toLowerCase().includes(search.toLowerCase()));
+    
+    const matchesLang = selectedLangs.length === 0 || 
+      offer.languages.some(l => selectedLangs.includes(l));
+      
+    return matchesSearch && matchesLang;
+  });
+
+  const toggleLang = (lang: string) => {
+    setSelectedLangs(prev => 
+      prev.includes(lang) ? prev.filter(l => l !== lang) : [...prev, lang]
+    );
+  };
 
   const handleOfferSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,15 +122,15 @@ export default function VolunteersPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-8 md:mb-12">
         <div>
-          <h1 className="text-4xl font-display font-extrabold text-slate-900 mb-2">Community Champions</h1>
-          <p className="text-slate-500 text-lg">Neighbors offering their time, skills, and kindness.</p>
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold text-slate-900 mb-2">Community Champions</h1>
+          <p className="text-slate-500 text-sm md:text-lg">Neighbors offering their time, skills, and kindness.</p>
         </div>
         <button 
           onClick={() => setShowOfferForm(!showOfferForm)}
-          className="bg-brand-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-brand-600 transition-all shadow-xl shadow-brand-100 flex items-center gap-2"
+          className="w-full sm:w-auto bg-brand-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-brand-600 transition-all shadow-xl shadow-brand-100 flex items-center justify-center gap-2"
         >
           {showOfferForm ? <Users className="rotate-45" /> : <HeartIcon />}
           {showOfferForm ? 'Cancel' : 'I want to Volunteer'}
@@ -123,14 +143,14 @@ export default function VolunteersPage() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-12"
+            className="overflow-hidden mb-8 md:mb-12"
           >
-            <div className="bg-white rounded-[40px] p-8 md:p-12 border-2 border-brand-100 shadow-xl shadow-brand-100/10">
-              <h2 className="text-3xl font-display font-bold text-slate-900 mb-8 flex items-center gap-3">
-                 <ShieldCheck className="w-8 h-8 text-brand-500" />
-                 Join the Kindness Network
+            <div className="bg-white rounded-[32px] md:rounded-[40px] p-6 md:p-12 border-2 border-brand-100 shadow-xl shadow-brand-100/10">
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-slate-900 mb-6 md:mb-8 flex items-center gap-3">
+                 <ShieldCheck className="w-7 h-7 md:w-8 h-8 text-brand-500" />
+                 Join the Network
               </h2>
-              <form onSubmit={handleOfferSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <form onSubmit={handleOfferSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Your Name</label>
@@ -193,10 +213,10 @@ export default function VolunteersPage() {
                   <button 
                     disabled={submitting}
                     type="submit"
-                    className="flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:opacity-50"
+                    className="w-full md:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:opacity-50"
                   >
                     {submitting ? <Loader2 className="animate-spin w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
-                    Register as Volunteer
+                    Register Now
                   </button>
                 </div>
               </form>
@@ -213,6 +233,8 @@ export default function VolunteersPage() {
             <input 
               type="text" 
               placeholder="Search skills..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3 transition-all focus:ring-2 focus:ring-brand-500 outline-none"
             />
           </div>
@@ -225,8 +247,16 @@ export default function VolunteersPage() {
             <div className="space-y-3">
               {['English', 'Spanish', 'Mandarin', 'French', 'Arabic'].map(lang => (
                 <label key={lang} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" className="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
-                  <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">{lang}</span>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedLangs.includes(lang)}
+                    onChange={() => toggleLang(lang)}
+                    className="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500" 
+                  />
+                  <span className={cn(
+                    "text-sm font-medium transition-colors",
+                    selectedLangs.includes(lang) ? "text-brand-600" : "text-slate-600 group-hover:text-slate-900"
+                  )}>{lang}</span>
                 </label>
               ))}
             </div>
@@ -242,7 +272,7 @@ export default function VolunteersPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {offers.map((offer) => (
+              {filteredOffers.length > 0 ? filteredOffers.map((offer) => (
                 <motion.div
                   key={offer.id}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -310,7 +340,11 @@ export default function VolunteersPage() {
                     )}
                   </AnimatePresence>
                 </motion.div>
-              ))}
+              )) : (
+                <div className="col-span-full py-20 text-center bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+                  <p className="text-slate-400 font-bold">No volunteers match your current filters.</p>
+                </div>
+              )}
             </div>
           )}
         </div>

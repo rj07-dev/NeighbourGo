@@ -25,15 +25,15 @@ export default function SupportAnalytics() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6">
         <div className="max-w-2xl">
-          <h2 className="text-4xl font-display font-extrabold text-slate-900 mb-4 flex items-center gap-3">
+          <h2 className="text-3xl md:text-4xl font-display font-extrabold text-slate-900 mb-4 flex items-center gap-3">
             <TrendingUp className="w-8 h-8 text-brand-500" />
-            Community Support Analytics
+            Impact Metrics
           </h2>
-          <p className="text-slate-500 text-lg">
-            Analyzing demand trends helps neighborhoods pre-allocate resources and volunteers where they are needed most. This data is extracted and categorized by Gemini 2.0.
+          <p className="text-slate-500 text-base md:text-lg">
+            Analyzing demand trends helps neighborhoods pre-allocate resources. Categorized by Gemini AI.
           </p>
         </div>
         <div className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">
@@ -48,9 +48,9 @@ export default function SupportAnalytics() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
             <h3 className="text-lg font-bold text-slate-800 mb-8">Requests by Category</h3>
-            <div className="h-[400px] w-full">
+            <div className="h-[300px] md:h-[400px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />

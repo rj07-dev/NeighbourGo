@@ -86,19 +86,21 @@ export async function chatAssistant(message: string, history: { role: string, co
   `;
 
   try {
-    const chat = ai.chats.create({
+    const response = await ai.models.generateContent({
       model,
+      contents: [
+        ...history.map(h => ({
+          role: h.role === 'user' ? 'user' : 'model',
+          parts: [{ text: h.content }]
+        })),
+        { role: 'user', parts: [{ text: message }] }
+      ],
       config: {
         systemInstruction
-      },
-      history: history.map(h => ({
-        role: h.role === 'user' ? 'user' : 'model',
-        parts: [{ text: h.content }]
-      }))
+      }
     });
 
-    const result = await chat.sendMessage({ message });
-    return result.text;
+    return response.text;
   } catch (error) {
     console.error("Gemini Chat Error:", error);
     throw new Error("Assistant is currently resting. Please try again in a moment.");

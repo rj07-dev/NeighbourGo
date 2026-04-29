@@ -3,7 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,7 +16,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 // In-memory data store for the demo
 let requests: any[] = [
@@ -242,12 +242,15 @@ app.post('/api/requests', async (req, res) => {
 
     // If AI data wasn't provided by the client, try to generate it (fallback)
     if (!analysis) {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // Use stable flash for fallback
-      const prompt = `Analyze this community support request and return JSON: Title: ${title}, Description: ${description}. Include: category, urgency, isSafe (bool), optimizedText, tags (array), detectedLanguage.`;
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      analysis = JSON.parse(cleanJson);
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Analyze this community support request and return JSON: Title: ${title}, Description: ${description}. Include: category, urgency, isSafe (bool), optimizedText, tags (array), detectedLanguage.`,
+        config: {
+          responseMimeType: "application/json"
+        }
+      });
+      const text = response.text;
+      analysis = JSON.parse(text);
     }
 
     if (!analysis.isSafe) {
@@ -307,17 +310,17 @@ app.post('/api/match-explain', async (req, res) => {
   if (!request || !volunteer) return res.status(404).json({ error: 'Not found' });
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const prompt = `
-      Explain why this volunteer matches this community request.
-      Volunteer: ${volunteer.userName} (Skills: ${volunteer.skills.join(', ')}, Languages: ${volunteer.languages.join(', ')})
-      Request: ${request.title} (${request.aiOptimizedDescription})
-      
-      Keep the explanation warm, encouraging, and under 3 sentences.
-    `;
-
-    const result = await model.generateContent(prompt);
-    res.json({ explanation: result.response.text() });
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `
+        Explain why this volunteer matches this community request.
+        Volunteer: ${volunteer.userName} (Skills: ${volunteer.skills.join(', ')}, Languages: ${volunteer.languages.join(', ')})
+        Request: ${request.title} (${request.aiOptimizedDescription})
+        
+        Keep the explanation warm, encouraging, and under 3 sentences.
+      `
+    });
+    res.json({ explanation: response.text });
   } catch (err) {
     res.status(500).json({ error: 'Matching failed' });
   }
@@ -328,28 +331,32 @@ app.post('/api/assistant', async (req, res) => {
   const { message, history } = req.body;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const chat = model.startChat({
-      history: history.map((m: any) => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }]
-      }))
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: [
+        ...history.map((m: any) => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          parts: [{ text: m.content }]
+        })),
+        {
+          role: 'user',
+          parts: [{ text: `
+            You are the NeighbourGo AI Assistant. 
+            You help people in the community find resources, understand how to help, 
+            and answer questions about using the app.
+            Be kind, professional, and community-focused.
+            
+            Current system state for context:
+            Total Requests: ${requests.length}
+            Total Volunteers: ${offers.length}
+            
+            User message: ${message}
+          `}]
+        }
+      ]
     });
 
-    const result = await chat.sendMessage(`
-      You are the NeighbourGo AI Assistant. 
-      You help people in the community find resources, understand how to help, 
-      and answer questions about using the app.
-      Be kind, professional, and community-focused.
-      
-      Current system state for context:
-      Total Requests: ${requests.length}
-      Total Volunteers: ${offers.length}
-      
-      User message: ${message}
-    `);
-
-    res.json({ text: result.response.text() });
+    res.json({ text: response.text });
   } catch (err) {
     res.status(500).json({ error: 'Assistant error' });
   }

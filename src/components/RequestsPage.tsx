@@ -82,15 +82,15 @@ export default function RequestsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8 md:mb-12">
         <div>
-          <h1 className="text-4xl font-display font-extrabold text-slate-900 mb-2">Community Support Feed</h1>
-          <p className="text-slate-500">Respond to neighbors in need or post your own request.</p>
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold text-slate-900 mb-2">Community Support Feed</h1>
+          <p className="text-slate-500 text-sm md:text-base">Respond to neighbors in need or post your own request.</p>
         </div>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-brand-500 text-white px-6 py-3 rounded-2xl font-bold hover:bg-brand-600 transition-all shadow-xl shadow-brand-100"
+          className="w-full sm:w-auto flex justify-center items-center gap-2 bg-brand-500 text-white px-6 py-4 md:py-3 rounded-2xl font-bold hover:bg-brand-600 transition-all shadow-xl shadow-brand-100"
         >
           {showForm ? <Plus className="rotate-45" /> : <Plus />}
           {showForm ? 'Cancel' : 'Post Request'}
@@ -103,14 +103,14 @@ export default function RequestsPage() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-12"
+            className="overflow-hidden mb-8 md:mb-12"
           >
-            <div className="bg-white rounded-3xl p-8 border-2 border-brand-100 shadow-sm">
-              <h2 className="text-2xl font-display font-bold mb-6 flex items-center gap-2">
+            <div className="bg-white rounded-3xl p-6 md:p-8 border-2 border-brand-100 shadow-sm transition-all">
+              <h2 className="text-xl md:text-2xl font-display font-bold mb-6 flex items-center gap-2">
                 <Send className="w-6 h-6 text-brand-500" />
                 What do you need help with?
               </h2>
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Your Name</label>
@@ -159,10 +159,10 @@ export default function RequestsPage() {
                   <button 
                     disabled={isPosting}
                     type="submit"
-                    className="flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all disabled:opacity-50"
+                    className="w-full md:w-auto flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-5 md:py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all disabled:opacity-50"
                   >
                     {isPosting ? <Loader2 className="animate-spin w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-                    Post with AI Optimization
+                    Post Request
                   </button>
                 </div>
               </form>
@@ -226,7 +226,7 @@ export default function RequestsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
               >
-                <div className="p-8 grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-8">
                   <div className="md:col-span-2 space-y-4">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">

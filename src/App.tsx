@@ -56,10 +56,17 @@ function App() {
       case 'impact':
         return <SupportAnalytics />;
       case 'ai-support':
-        return <div className="max-w-4xl mx-auto py-12 px-4 h-[80vh] flex flex-col">
-          <h1 className="text-3xl font-display font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">NeighbourGo AI Assistant</h1>
-          <ChatAdvisor />
-        </div>;
+        return (
+          <div className="max-w-4xl mx-auto py-12 px-4 h-[calc(100vh-140px)] flex flex-col">
+            <div className="mb-8">
+              <h1 className="text-4xl font-display font-black text-slate-900 mb-2">Community Assistant</h1>
+              <p className="text-slate-500 font-medium tracking-tight">AI-powered support to help you navigate our neighborhood network.</p>
+            </div>
+            <div className="flex-grow min-h-0">
+              <ChatAdvisor inline />
+            </div>
+          </div>
+        );
       case 'dashboard':
         return <Dashboard />;
       case 'admin':
@@ -103,6 +110,9 @@ function App() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Floating AI Assistant - hidden when on the dedicated AI page */}
+      {activeTab !== 'ai-support' && <ChatAdvisor />}
 
       <Footer onNavigate={setActiveTab} />
     </div>

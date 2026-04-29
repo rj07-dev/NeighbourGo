@@ -10,8 +10,12 @@ interface Message {
   content: string;
 }
 
-export default function ChatAdvisor() {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatAdvisorProps {
+  inline?: boolean;
+}
+
+export default function ChatAdvisor({ inline = false }: ChatAdvisorProps) {
+  const [isOpen, setIsOpen] = useState(inline);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hello! I'm NeighbourGo's AI Support. I can help you find resources, explain how to offer help, or guide you through posting a request. How can I help your community today?" }
   ]);
@@ -55,14 +59,17 @@ export default function ChatAdvisor() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <AnimatePresence>
+    <div className={cn(!inline && "fixed bottom-6 right-6 z-50")}>
+      <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={inline ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="mb-4 w-96 h-[550px] bg-white rounded-[32px] shadow-2xl border border-brand-100 flex flex-col overflow-hidden"
+            exit={inline ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20 }}
+            className={cn(
+              "bg-white rounded-[32px] shadow-2xl border border-brand-100 flex flex-col overflow-hidden",
+              inline ? "w-full h-full" : "mb-4 w-96 h-[550px]"
+            )}
           >
             <div className="p-5 bg-slate-900 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -77,9 +84,11 @@ export default function ChatAdvisor() {
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1.5 rounded-xl transition-colors">
-                <X className="w-5 h-5" />
-              </button>
+              {!inline && (
+                <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1.5 rounded-xl transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
 
             <div ref={scrollRef} className="flex-grow overflow-y-auto p-6 space-y-6 bg-slate-50/50">
@@ -136,13 +145,15 @@ export default function ChatAdvisor() {
         )}
       </AnimatePresence>
 
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-slate-900 text-white p-4 rounded-full shadow-2xl hover:bg-slate-800 transition-all hover:scale-110 active:scale-95 group relative"
-      >
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-500 rounded-full border-2 border-white"></div>
-        {isOpen ? <X className="w-6 h-6" /> : <MessageSquareSparkles className="w-6 h-6 group-hover:animate-pulse" />}
-      </button>
+      {!inline && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="bg-slate-900 text-white p-4 rounded-full shadow-2xl hover:bg-slate-800 transition-all hover:scale-110 active:scale-95 group relative"
+        >
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-500 rounded-full border-2 border-white"></div>
+          {isOpen ? <X className="w-6 h-6" /> : <MessageSquareSparkles className="w-6 h-6 group-hover:animate-pulse" />}
+        </button>
+      )}
     </div>
   );
 }
